@@ -1,0 +1,16 @@
+{% extends "snow_inspector/base.html" %}
+
+{% block app_navigation_items %}
+  <li class="active"><a href="{% url 'snow_inspector:home' %}">Home</a></li>
+  <li><a href="{% url 'snow_inspector:map' %}">Map Input</a></li>
+  <li><a href="{% url 'snow_inspector:snow_graph' %}">Snow Graph</a></li>
+{% endblock %}
+
+{% block app_content %}
+  <h1>Welcome!</h1>
+  <p>Congratulations on creating a new Tethys app!</p>
+{% endblock %}
+
+{% block app_actions %}
+  <a href="{% url 'snow_inspector:map' %}" class="btn btn-default">Go To Map</a>
+{% endblock %}
