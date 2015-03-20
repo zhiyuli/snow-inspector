@@ -1,5 +1,7 @@
 {% extends "snow_inspector/base.html" %}
 
+{% load staticfiles %}
+
 {% load tethys_gizmos %}
 
 
@@ -7,11 +9,6 @@
 {% block app_navigation_items %}
 <form method="get" action="../snow_graph/">
   {% csrf_token %}
-  <li class="title">Snow Location</li>
-  <li class="active">
-    <a href="{% url 'snow_inspector:map' %}">Map Input</a>
-  </li>
-  <li><a href="{% url 'snow_inspector:snow_graph' %}">Snow Graph</a></li>
   <li>
     {% gizmo date_picker date_picker %}
     {% gizmo text_input days_picker %}
@@ -19,6 +16,7 @@
     {% gizmo text_input lon_picker %}
   </li>
   <li>
+  <input type="hidden" id="end" name="end"></input>
   <input type="submit" value="GET SNOW!" name="name-form-submit" class="btn btn-default">
   </li>
 
@@ -26,12 +24,10 @@
 {% endblock %}
 
 {% block app_content %}
-  
-  
-    <h1>Move snow location on the map</h1>
-    <br /><br />
-    
-  {% gizmo google_map_view map_options %}
+   
+    <p>Move snow location on the map</p>
+    {% gizmo map_view map_options %}
+
 {% endblock %}
 
 {% block app_actions %}
@@ -40,4 +36,5 @@
 
 {% block scripts %}
   {{ block.super }}
+  <script src="{% static 'snow_inspector/js/map.js' %}"></script>
 {% endblock %}

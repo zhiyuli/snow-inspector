@@ -3,17 +3,13 @@
 {% load tethys_gizmos %}
 
 {% block app_navigation_items %} 
-	<li><a href="{% url 'snow_inspector:map' %}">Map Input</a></li>
-	<li class="active"><a href="{% url 'snow_inspector:snow_graph' %}">Snow Graph</a></li> 
+	<li><a href="{% url 'snow_inspector:map' %}">Map Input</a></li> 
 {% endblock %}
 
 {% block app_content %}
-  <h1>Snow Graph For: <span id="lat">{{lat}}</span> <span id="lon">{{lon}}</span></h1>
-  <!--<h2>User input geometry:</h2>
-  <pre>
-  {{selected_geometry}}
-  </pre>
-  <h2>Chart:</h2>-->
+  <p>Snow Graph For: <span id="lat">{{lat}}</span> <span id="lon">{{lon}}</span></p>
+  <p>time period: <span id="startDate">{{startDate}}</span>&nbsp;-&nbsp;<span id="endDate">{{endDate}}</span></p>
+
   <div id="snow-chart"></div> 
 {% endblock %}
 

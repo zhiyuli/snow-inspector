@@ -1,5 +1,7 @@
 {% extends "snow_inspector/base.html" %}
 
+{% load staticfiles %}
+
 {% load tethys_gizmos %}
 
 
@@ -26,12 +28,10 @@
 {% endblock %}
 
 {% block app_content %}
-  
-  
-    <h1>Move snow location on the map</h1>
-    <br /><br />
-    
-  {% gizmo google_map_view map_options %}
+   
+    <p>Move snow location on the map</p>
+    <div id="map"></div>
+
 {% endblock %}
 
 {% block app_actions %}
@@ -40,4 +40,13 @@
 
 {% block scripts %}
   {{ block.super }}
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=drawing&sensor=false"></script>
+  <script src="{% static 'snow_inspector/js/gmaps.js' %}"></script>
+  <script>
+      var map=new GMaps({
+        el: '#map',
+        lat: 40.00,
+        lng: -110.00
+      });
+  </script>
 {% endblock %}
