@@ -1,4 +1,4 @@
-console.log("Snow inspector!");
+console.log("Snow inspector! main_snow.js");
 
 var chart;
 
@@ -23,13 +23,13 @@ function get_hydrologic_year(date) {
    return year;
 }
 
-function update_chart(lat, lon) { 
+function update_chart(lat, lon, begin, end) { 
    //var hydro_year = get_hydrologic_year(date);
    //var beginDate = Date.UTC((hydro_year - 1), 9, 1);
    //var series_url = get_chart_url(station_id, hydro_year);
-   var beginDate = Date.UTC(2014, 11, 1);
+   var beginDate = Date.parse(begin);
 
-   var series_url = "/apps/snow-inspector/snow_data/?lat=" + lat + "&lon=" + lon +"&start=2014-12-01&end=2015-03-03";
+   var series_url = "/apps/snow-inspector/snow_data/?lat=" + lat + "&lon=" + lon +"&start=" + begin + "&end=" + end;
 
    console.log('update_chart: load data from ' + series_url);
    chart.showLoading('Loading Snow Data...');
@@ -56,7 +56,9 @@ $(document).ready(function () {
         } else {
 		var lat = $("#lat").text();
 		var lon = $("#lon").text();
-		console.log("lat: " + lat + "lon: " + lon);
+		var begin_date = $("#startDate").text();
+		var end_date = $("#endDate").text();
+		console.log("lat: " + lat + " lon: " + lon + " begin_date: " + begin_date + " end_date: " + end_date);
 	}
 
 var chart_options = {
@@ -110,9 +112,9 @@ var chart_options = {
 };
 
 chart_options.series[0].type = 'area';
-chart_options.series[0].name = 'Snow Depth';
+chart_options.series[0].name = 'Snow Coverage';
 chart = new Highcharts.Chart(chart_options);
 
-update_chart(lat, lon);
+update_chart(lat, lon, begin_date, end_date);
 
 });

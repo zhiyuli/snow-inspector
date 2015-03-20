@@ -25,7 +25,7 @@ class SnowInspector(TethysAppBase):
                            controller='snow_inspector.controllers.home'),
                     UrlMap(name='map',
                            url='snow-inspector/map',
-                           controller='snow_inspector.controllers.map'),
+                           controller='snow_inspector.map.map'),
                     UrlMap(name='snow_graph',
                            url='snow-inspector/snow_graph',
                            controller='snow_inspector.controllers.snow_graph'),
