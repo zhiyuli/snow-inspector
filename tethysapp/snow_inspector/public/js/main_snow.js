@@ -38,8 +38,10 @@ function update_chart(lat, lon, begin, end) {
         
         var timeSeries = [];
 	for (var i = 0; i < data.data.length; i++){
-		timeSeries.push([beginDate + (86400000 * i), data.data[i]]);
-        }  
+		if (data.data[i] !== null) {
+			timeSeries.push([beginDate + (86400000 * i), data.data[i]]);
+		}
+    }  
 	chart.series[0].setData(timeSeries);
 	chart.setTitle({text: ''});
         chart.hideLoading();
@@ -94,8 +96,8 @@ var chart_options = {
 		enabled: false
 	},
 	plotOptions: {
-		area: {
-			fillColor: Highcharts.getOptions().colors[0],
+		line: {
+			color: Highcharts.getOptions().colors[0],
 			marker: {
 				radius: 2
 			},
@@ -111,7 +113,7 @@ var chart_options = {
 	series: [{}]
 };
 
-chart_options.series[0].type = 'area';
+chart_options.series[0].type = 'line';
 chart_options.series[0].name = 'Snow Coverage';
 chart = new Highcharts.Chart(chart_options);
 
