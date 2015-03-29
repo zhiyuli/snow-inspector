@@ -53,7 +53,7 @@ def map(request):
         'name': 'endDate',
         'autoclose': True,
         'format': 'yyyy-mm-dd',
-        'start_date': '1/1/2013',
+        'start_date': '2013-01-01',
         'today_button': True,
         'initial': datetime.datetime.today().strftime("%Y-%m-%d")
     }
