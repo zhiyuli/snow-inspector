@@ -33,6 +33,14 @@ def getTileURL(xtile, ytile, zoom, date):
     return baseURL.format(layer, time, tileMatrix, zoom, ytile, xtile)
     
         
+def getTileURLTemplate(xtile, ytile, zoom):
+    baseURL = 'http://map1.vis.earthdata.nasa.gov/wmts-webmerc/' + \
+    '{0}/default/{1}/{2}/{3}/{4}/{5}.png'
+    layer = 'MODIS_Terra_Snow_Cover'
+    tileMatrix = 'GoogleMapsCompatible_Level8'
+    time = 'DATE_PLACEHOLDER'
+    return baseURL.format(layer, time, tileMatrix, zoom, ytile, xtile)
+    
 
     
 def getTimeSeries(lat, lon, beginDate, endDate):
@@ -62,6 +70,7 @@ def get_data_json(request):
     """
     Controller that will show the snow data in Json format
     """
+
     #default value for lat, lon
     lat = '50'
     lon = '15'
@@ -80,7 +89,12 @@ def get_data_json(request):
             enddate = datetime.datetime.strptime(end, "%Y-%m-%d")
     
     context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end}
+    
+    #pass url of tile to output
+    zoom = 8
+    xtile, ytile, xpixel, ypixel = deg2num(lat, lon, zoom)
+    tile = getTileURLTemplate(xtile, ytile, zoom)
 
     v = getTimeSeries(lat, lon, startdate, enddate)
 
-    return JsonResponse({"query":context, "data":v})
+    return JsonResponse({"query":context, "tile":tile, "data":v})

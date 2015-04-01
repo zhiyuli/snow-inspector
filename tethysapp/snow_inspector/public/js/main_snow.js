@@ -32,13 +32,22 @@ function add_data_to_chart(beginDate, response_data, myChart) {
 
 function add_data_to_chart2(response_data, myChart) {
 	var n = myChart.series[0].data.length;
-	var beginDate = myChart.series[0].data[n - 1].x + 86400000;
+	var beginDate = Date.parse(response_data.query.startdate);
 	for (var i = 0; i < response_data.data.length; i++){
 		if (response_data.data[i] !== null) {		
 			var newPoint = [beginDate + (86400000 * i), response_data.data[i]];
 			myChart.series[0].addPoint(newPoint);
 		}
 	}  
+}
+
+function set_chart_tooltip(myChart, tile_url) {
+	myChart.tooltip.options.formatter = function() {
+		x_date = (new Date(this.x)).toISOString().substring(0, 10);
+		var url = tile_url.replace("DATE_PLACEHOLDER", x_date);
+		var html = '<p>original data: ' + x_date + ' snow: ' + this.y + '%</p><img width="256px" height="256px" src="' + url + '" />';	
+		return html;	
+	}
 }
 
 
@@ -83,23 +92,6 @@ function update_chart(lat, lon, begin, end) {
    //the number of the request currently executed
    var iRequest = 0;
 
-   	//adds initial data to the chart
-    function ajax1() {
-		console.log("ajax1! " + urls[0]);
-		$.ajax({
-			url: urls[0], 
-			type: "GET",
-			dataType: "json",
-			success: function(response_data){
-				//add first data to 
-				add_data_to_chart(beginDate, response_data, chart);
-				iRequest++;
-				
-				ajax2();
-			}
-		});
-	}
-
 	//adds data to chart with existing data
 	function ajax2() {
 		console.log("ajax2! " + urls[iRequest]);
@@ -108,37 +100,31 @@ function update_chart(lat, lon, begin, end) {
 			type: "GET",
 			dataType: "json",
 			success: function(response_data){
+
+				if (iRequest === 0) {
+					set_chart_tooltip(chart, response_data.tile)
+				}
+
 				add_data_to_chart2(response_data, chart);
+				
 				iRequest++;
 				if (iRequest < urls.length) {
 					ajax2();
 				}	
+			},
+			error: function() {
+				//try to repeat data retrieval..
+				console.log("error for URL: " + urls[iRequest]);
+				ajax2();
 			}
 		});
 	}
 
-
-
-
-    ajax1();
+    ajax2();
 
 
    //chart.showLoading('Loading Snow Data...');
-/*
-   $.getJSON(series_url, function(data) {
-        
-        var timeSeries = [];
-	for (var i = 0; i < data.data.length; i++){
-		if (data.data[i] !== null) {
-			timeSeries.push([beginDate + (86400000 * i), data.data[i]]);
-		}
-    }  
-	chart.series[0].setData(timeSeries);
-	chart.setTitle({text: ''});
-        chart.hideLoading();
-		
-   });
-*/
+   //chart.hideLoading();
 }
 
 
@@ -175,6 +161,12 @@ var chart_options = {
         },
 	title: {
 		text: 'Snow Coverage at: ' + lat + 'N ' + lon + 'E'
+	},
+	tooltip: {
+		useHTML: true,
+		formatter: function() {
+			return '<p>The value of <b>' + this.x + '</b> is <b>' + this.y + '</b></p><img width=256px height=256px src="http://localhost:8000/static/snow_inspector/images/icon.gif">';
+		}
 	},
 	xAxis: {
 		type: 'datetime',
