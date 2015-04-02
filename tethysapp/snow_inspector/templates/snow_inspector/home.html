@@ -7,8 +7,12 @@
 {% endblock %}
 
 {% block app_content %}
-  <h1>Welcome!</h1>
-  <p>Congratulations on creating a new Tethys app!</p>
+  <h1>Welcome to the Snow Inspector!</h1>
+  <p>The Snow Inspector app lets you explore the history of snow cover at any point in
+  	the world using data from the MODIS Terra satellite sensor. The original data is retrieved
+  	from map tiles of the NASA Global Imagery Browse Service (GIBS)</p>
+  <p>To start the application, <a href="{% url 'snow_inspector:map' %}">go to the map</a> and
+  	select your point of interest to show the snow coverage time series.
 {% endblock %}
 
 {% block app_actions %}

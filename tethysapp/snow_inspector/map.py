@@ -43,7 +43,7 @@ def map(request):
             'maxZoom': 18, 
             'minZoom': 3,
             },
-       'base_map': 'MapQuest',
+       'base_map': 'OpenStreetMap',
     }
     
 
