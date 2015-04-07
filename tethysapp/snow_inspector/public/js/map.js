@@ -47,8 +47,8 @@ var vector = new ol.layer.Vector({
 
 map.addLayer(vector);
 
-var lat = 40.238;
-var lon = -111.55;
+var lat = 40.2380;
+var lon = -111.5500;
 var dbPoint = {
 	"type": "Point",
 	"coordinates": [lon, lat]
@@ -86,8 +86,8 @@ map.on('click', function(evt) {
 	//now update lat and long in textbox
 
 	var lonlat = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-	$("#inputLon").val(lonlat[0]);
-	$("#inputLat").val(lonlat[1]);
+	$("#inputLon").val(lonlat[0].toFixed(6));
+	$("#inputLat").val(lonlat[1].toFixed(6));
 })
 
 });
