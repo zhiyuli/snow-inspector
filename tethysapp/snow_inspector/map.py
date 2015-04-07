@@ -27,26 +27,7 @@ def map(request):
     geojson_sites = {"type": "GeometryCollection",
                      "geometries": geometries}
 
-    #configure the map
-    google_map_options = {
-        'height': '500px',
-        'width': '100%',
-        'input_overlays': geojson_sites
-    }
-    openlayers_map_options = {
-        'height': '500px',
-        'width': '100%',
-        'view': {
-            'projection': 'EPSG:4326',
-            'center': [-100, 40], 
-            'zoom': 4,
-            'maxZoom': 18, 
-            'minZoom': 3,
-            },
-       'base_map': 'OpenStreetMap',
-    }
     
-
     #configure the date picker
     today = datetime.date.today()
     date_picker = {'display_text': 'Date',
@@ -73,8 +54,7 @@ def map(request):
 
     
     # Pass variables to the template via the context dictionary
-    context = {'map_options': openlayers_map_options, 
-               'date_picker':date_picker,
+    context = {'date_picker':date_picker,
                'days_picker':days_picker,
                'lon_picker':lon_picker,
                'lat_picker':lat_picker}
