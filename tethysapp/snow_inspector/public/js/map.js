@@ -88,6 +88,9 @@ map.on('click', function(evt) {
 	var lonlat = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
 	$("#inputLon").val(lonlat[0].toFixed(6));
 	$("#inputLat").val(lonlat[1].toFixed(6));
+	if (lonlat[0] < -180) {
+		$("#inputLon").val((360 + lonlat[0]).toFixed(6));
+	}
 })
 
 });
