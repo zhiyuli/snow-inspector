@@ -2,8 +2,29 @@
 
 $(document).ready(function () {
 
-var map = TETHYS_MAP_VIEW.getMap();
+
 var source = new ol.source.Vector();
+
+var esri = new ol.layer.Tile({
+	source: new ol.source.XYZ({
+		attribution: [new ol.Attribution({
+			html: 'Tiles &copy; <a href="http://services.arcgisonline.com/ArcGIS/' +
+			'rest/services/World_Topo_Map/MapServer>ArcGIS</a>'
+		})],
+		url: 'http://server.arcgisonline.com/ArcGIS/rest/services/' +
+		'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
+	})
+});
+
+var map = new ol.Map({
+	layers: [esri],
+	controls: ol.control.defaults(),
+	target: 'map_view',
+	view: new ol.View({
+		center: [0, 0],
+		zoom: 2
+	})
+});
 
 var vector = new ol.layer.Vector({
   source: source,

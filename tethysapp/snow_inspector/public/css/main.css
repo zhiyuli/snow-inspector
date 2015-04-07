@@ -1,0 +1,10 @@
+/* MAP STYLES */
+#map {
+	width: 100%;
+	height: 100%;
+}
+
+#map_view_outer_container {
+	position: relative;
+	margin: 20px;
+}
