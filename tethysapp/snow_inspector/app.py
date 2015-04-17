@@ -31,7 +31,10 @@ class SnowInspector(TethysAppBase):
                            controller='snow_inspector.controllers.snow_graph'),
                     UrlMap(name='snow_data',
                            url='snow-inspector/snow_data',
-                           controller='snow_inspector.modis.get_data_json')
+                           controller='snow_inspector.modis.get_data_json'),
+                    UrlMap(name='waterml',
+                           url='snow-inspector/waterml',
+                           controller='snow_inspector.modis.get_data_waterml')
         )
 
         return url_maps

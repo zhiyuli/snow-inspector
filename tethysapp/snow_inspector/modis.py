@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.shortcuts import render_to_response
 import json
 import math
 import datetime
@@ -66,11 +67,7 @@ def getImage(url, rowpixel, colpixel):
     return pxlist[rowpixel][colpixel]
 
 
-def get_data_json(request):
-    """
-    Controller that will show the snow data in Json format
-    """
-
+def process_query(request):
     #default value for lat, lon
     lat = '50'
     lon = '15'
@@ -89,7 +86,53 @@ def get_data_json(request):
             enddate = datetime.datetime.strptime(end, "%Y-%m-%d")
     
     context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end}
+    return context
+
+
+def get_site_name(lat, lon):
+    lat_name = "%0.4fN" % lat
+    if lat < 0:
+        lat_name = "%0.4fS" % (-1 * lat)
+    lon_name = "%0.4fE" % lon
+    if lon < 0:
+        lon_name = "%0.4fW" % (-1 * lon)
+
+    return lat_name + lon_name
+
+def format_time_series(startDate, ts, nodata_value):
+    nDays = len(ts)
+    datelist = [startDate + datetime.timedelta(days=x) for x in range(0,nDays)]
+    formatted_ts = []
+    for i in range(0, nDays):
+        formatted_val = ts[i]
+        if (formatted_val is None):
+            formatted_val = nodata_value
+        formatted_date = datelist[i].strftime('%Y-%m-%dT%H:%M:%S')
+        formatted_ts.append({'date':formatted_date, 'val':formatted_val})
+
+    return formatted_ts
+
+def get_data_json(request):
+    """
+    Controller that will show the snow data in Json format
+    """  
+    lat = '50'
+    lon = '15'
+    start = datetime.datetime.today().strftime("%Y-%m-%d")
+    end = (datetime.datetime.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+
+    if request.GET:
+        lat = request.GET["lat"]
+        lon = request.GET["lon"]
+        start = request.GET["start"]
+        end = request.GET["end"]
+
+        if request.GET["start"]:
+            startdate = datetime.datetime.strptime(start, "%Y-%m-%d")
+        if request.GET["end"]:
+            enddate = datetime.datetime.strptime(end, "%Y-%m-%d")
     
+    context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end}
     #pass url of tile to output
     zoom = 8
     xtile, ytile, xpixel, ypixel = deg2num(lat, lon, zoom)
@@ -98,3 +141,35 @@ def get_data_json(request):
     v = getTimeSeries(lat, lon, startdate, enddate)
 
     return JsonResponse({"query":context, "tile":tile, "data":v})
+
+
+def get_data_waterml(request):
+    """
+    Controller that will show the data in WaterML 1.1 format
+    """
+    lat = '50'
+    lon = '15'
+    start = datetime.datetime.today().strftime("%Y-%m-%d")
+    end = (datetime.datetime.today() - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+
+    if request.GET:
+        lat = request.GET["lat"]
+        lon = request.GET["lon"]
+        start = request.GET["start"]
+        end = request.GET["end"]
+
+        if request.GET["start"]:
+            startdate = datetime.datetime.strptime(start, "%Y-%m-%d")
+        if request.GET["end"]:
+            enddate = datetime.datetime.strptime(end, "%Y-%m-%d")
+    
+    zoom = 8
+    nodata_value = -9999
+    ts = getTimeSeries(lat, lon, startdate, enddate)
+    time_series = format_time_series(startdate, ts, nodata_value)
+    site_name = get_site_name(float(lat), float(lon))
+    context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end, 'site_name':site_name, 'time_series':time_series}
+
+    xmlResponse = render_to_response('snow_inspector/waterml.xml', context)
+    xmlResponse['Content-Type'] = 'application/xml;'
+    return xmlResponse

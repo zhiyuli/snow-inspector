@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.core.urlresolvers import reverse
 
 from .model import SessionMaker, SnowSite
 import json
@@ -100,9 +101,12 @@ def snow_graph(request):
         endDate2 = datetime.datetime.strptime(endDate, '%Y-%m-%d')
         startDate2 = (endDate2 - datetime.timedelta(days=numdays)).strftime("%Y-%m-%d")
 
+        #Make the waterml url query string
+        waterml_url = '?start=%s&end=%s&lat=%s&lon=%s' % (startDate2, endDate, lat, lon)
+
     
     #Create template context dictionary
-    context = {'lat':lat, 'lon':lon, 'startDate':startDate2, 'endDate': endDate}
+    context = {'lat':lat, 'lon':lon, 'startDate':startDate2, 'endDate': endDate, 'waterml_url': waterml_url}
 
     return render(request, 'snow_inspector/snow_graph.html', context)
 
