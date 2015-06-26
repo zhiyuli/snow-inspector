@@ -233,5 +233,6 @@ def get_data_waterml(request):
     context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end, 'site_name':site_name, 'time_series':time_series}
 
     xmlResponse = render_to_response('snow_inspector/waterml.xml', context)
-    xmlResponse['Content-Type'] = 'application/xml;'
+    xmlResponse['Content-Type'] = 'application/xml'
+    xmlResponse['content-disposition'] = "attachment; filename=output-time-series.xml"
     return xmlResponse
