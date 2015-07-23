@@ -5,7 +5,7 @@
 {% load tethys_gizmos %}
 
 {% block app_navigation_items %} 
-	<li><a href="{% url 'snow_inspector:map' %}">Map Input</a></li> 
+	<li><a href="{% url 'snow_inspector:map' %}{{map_url}}">Map Input</a></li> 
 {% endblock %}
 
 {% block app_content %}
