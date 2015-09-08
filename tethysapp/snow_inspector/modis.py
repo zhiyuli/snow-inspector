@@ -5,6 +5,7 @@ import math
 import datetime
 import png
 import urllib2
+from global_mercator import GlobalMercator
 
 
 """
@@ -43,7 +44,12 @@ def getTileURLTemplate(xtile, ytile, zoom):
     return baseURL.format(layer, time, tileMatrix, zoom, ytile, xtile)
 
 
-    
+def getPixelValues(lat, lon, date):
+    zoom = 8
+    xtile, ytile, xpixel, ypixel = deg2num(lat, lon, zoom)
+    url = getTileURL(xtile, ytile, zoom, date)
+    snow_val_list = getImageVals(url)
+    return snow_val_list
 
     
 def getTimeSeries(lat, lon, beginDate, endDate):
@@ -85,12 +91,25 @@ def yCoordinateToLatitude(y, zoom):
     n = math.pi - (2 * math.pi * float(y)) / (2 ** zoom)
     lat_rad = math.atan(math.sinh(n))
     return lat_rad * (180.0 / math.pi)
+
+def tileBoundsLonLat(x, y, zoom):
+    xMin = xCoordinateToLongitude(x, zoom)
+    yMin = yCoordinateToLatitude(y, zoom)
+    xMax = xCoordinateToLongitude(x+1,zoom)
+    yMax = yCoordinateToLatitude(y+1, zoom)
+    return (xMin, yMin, xMax, yMax)
     
 def getImage(url, rowpixel, colpixel):
     r = png.Reader(file=urllib2.urlopen(url))
     w, h, pixels, metadata = r.read()
     pxlist = list(pixels)
     return pxlist[rowpixel][colpixel]
+
+def getImageVals(url):
+    r = png.Reader(file=urllib2.urlopen(url))
+    w, h, pixels, metadata = r.read()
+    pxlist = list(pixels)
+    return pxlist
 
 
 def process_query(request):
@@ -235,3 +254,41 @@ def get_data_waterml(request):
     xmlResponse = render_to_response('snow_inspector/waterml.xml', context)
     xmlResponse['Content-Type'] = 'application/xml;'
     return xmlResponse
+
+
+#gets the pixel borders for the web Mercator mapX, mapY
+def get_pixel_borders(request):
+
+    if request.GET:
+        lat = float(request.GET["lat"])
+        lon = float(request.GET["lon"])
+
+    boundaryList = []
+    tileId = 0
+
+    bigTileX, bigTileY, xPixelBig, yPixelBig = deg2num(lat, lon, 8)
+    bigTileLon = xCoordinateToLongitude(bigTileX, 8)
+    bigTileLat = yCoordinateToLatitude(bigTileY, 8)
+    lon = bigTileLon
+    lat = bigTileLat
+    startTileX, startTileY, xPixel, yPixel = deg2num(lat, lon, 16)
+
+    valuesList = getPixelValues(lat, lon, datetime.datetime(2015, 1,1))
+
+    nX = 200
+    nY = 200
+    for i in range(0, nY):
+        for j in range(0, nY):
+            tileY = startTileY + i
+            tileX = startTileX + j
+            tileId = tileId + 1
+            pixelVal = valuesList[i][j]
+            print pixelVal
+            minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
+            tile = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
+            boundaryList.append(tile)
+
+    context = {'boundaries':boundaryList}
+    geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
+    geojsonResponse['Content-Type'] = 'application/json;'
+    return geojsonResponse

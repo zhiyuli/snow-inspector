@@ -37,7 +37,10 @@ class SnowInspector(TethysAppBase):
                            controller='snow_inspector.modis.get_data_waterml'),
                     UrlMap(name='pixel',
                            url='snow-inspector/pixel',
-                           controller='snow_inspector.modis.get_data_for_pixel')
+                           controller='snow_inspector.modis.get_data_for_pixel'),
+                    UrlMap(name='pixel-borders',
+                           url='snow-inspector/pixel-borders',
+                           controller='snow_inspector.modis.get_pixel_borders')
         )
 
         return url_maps

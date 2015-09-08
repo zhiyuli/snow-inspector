@@ -2,6 +2,64 @@
 
 $(document).ready(function () {
 
+	var modis = new ol.source.XYZ({
+        url: "//map1{a-c}.vis.earthdata.nasa.gov/wmts-webmerc/" +
+            "MODIS_Terra_Snow_Cover/default/2015-01-01/" +
+            "GoogleMapsCompatible_Level8/{z}/{y}/{x}.png"
+    });
+    var modislayer = new ol.layer.Tile({source: modis});
+
+	$("#btnShowModis").click(function(){
+		if (modislayer.getVisible()) {
+			modislayer.setVisible(false);
+		} else {
+			modislayer.setVisible(true);
+		}
+	})
+
+	$("#btnShowPixels").click(function(){
+		//add geojson layer with tile outlines
+		var center = map.getView().getCenter()
+		var lonlat = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+		var styleCache = {};
+
+		var pixelBoundaries = new ol.layer.Vector({
+			source : new ol.source.GeoJSON({
+				projection : 'EPSG:3857',
+				url : 'http://localhost:8000/apps/snow-inspector/pixel-borders/?lon=' + lonlat[0] + '&lat=' + lonlat[1]
+			}),
+			style : function(feature, resolution) {
+		var text = feature.get('val');
+		if (!styleCache[text]) {
+			styleCache[text] = [new ol.style.Style({
+				fill : new ol.style.Fill({
+					color : 'rgba(255, 255, 255, 0.1)'
+				}),
+				stroke : new ol.style.Stroke({
+					color : '#319FD3',
+					width : 1
+				}),
+				text : new ol.style.Text({
+					font : '12px Calibri,sans-serif',
+					text : text,
+					fill : new ol.style.Fill({
+						color : '#000'
+					}),
+					stroke : new ol.style.Stroke({
+						color : '#fff',
+						width : 3
+					})
+				}),
+				zIndex : 999
+			})];
+		}
+		return styleCache[text];
+	}
+		});
+		map.addLayer(pixelBoundaries);
+		console.log(center)
+	});
+
 
 var source = new ol.source.Vector();
 
@@ -16,7 +74,7 @@ var esri = new ol.layer.Tile({
 	})
 });
 
-var map = new ol.Map({
+map = new ol.Map({
 	layers: [esri],
 	controls: ol.control.defaults(),
 	target: 'map_view',
@@ -25,6 +83,9 @@ var map = new ol.Map({
 		zoom: 2
 	})
 });
+
+
+    map.addLayer(modislayer);
 
 var vector = new ol.layer.Vector({
   source: source,
@@ -46,6 +107,8 @@ var vector = new ol.layer.Vector({
 });
 
 map.addLayer(vector);
+
+
 
 var lat = 40.2380;
 var lon = -111.5500;
