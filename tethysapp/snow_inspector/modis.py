@@ -43,14 +43,6 @@ def getTileURLTemplate(xtile, ytile, zoom):
     time = 'DATE_PLACEHOLDER'
     return baseURL.format(layer, time, tileMatrix, zoom, ytile, xtile)
 
-
-def getPixelValues(lat, lon, date):
-    zoom = 8
-    xtile, ytile, xpixel, ypixel = deg2num(lat, lon, zoom)
-    url = getTileURL(xtile, ytile, zoom, date)
-    snow_val_list = getImageVals(url)
-    return snow_val_list
-
     
 def getTimeSeries(lat, lon, beginDate, endDate):
     nDays = (endDate - beginDate).days
@@ -256,44 +248,87 @@ def get_data_waterml(request):
     return xmlResponse
 
 
+#gets all of the tiles that are inside or overlap the bounding box
+def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
+
+    tiles = []
+    tileInfos = []
+    zoom = 8
+
+    #upper left
+    ulX, ulY, ulpixelXUL, ulpixelYUL = deg2num(latmax, lonmin, zoom)
+    ulTile = getTileURL(ulX, ulY, zoom, tileDate)
+    tiles.append(ulTile)
+    (xLeft, yTop, xRight, yBottom) = getPixelsInTile(ulX, ulY, lonmin, latmin, lonmax, latmax)
+    tileInfos.append({"url":ulTile, "xTile": ulX, "yTile": ulY,
+                      "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+
+
+    #upper right
+    urX, urY, urpixelX, urpixelY = deg2num(latmax, lonmax, zoom)
+    urTile = getTileURL(urX, urY, zoom, tileDate)
+    if not urTile in tiles:
+        tiles.append(urTile)
+        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(urX, urY, lonmin, latmin, lonmax, latmax)
+        tileInfos.append({"url":urTile, "xTile": urX, "yTile": urY,
+                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+
+
+    #lower left
+    llX, llY, llpixelX, llpixelY = deg2num(latmin, lonmin, zoom)
+    llTile = getTileURL(llX, llY, zoom, tileDate)
+    if not llTile in tiles:
+        tiles.append(llTile)
+        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(llX, llY, lonmin, latmin, lonmax, latmax)
+        tileInfos.append({"url":llTile, "xTile": llX, "yTile": llY,
+                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+
+
+
+    #lower right
+    lrX, lrY, lrpixelX, lrpixelY = deg2num(latmin, lonmax, zoom)
+    lrTile = getTileURL(lrX, lrY, zoom, tileDate)
+    if not lrTile in tiles:
+        tiles.append(lrTile)
+        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(lrX, lrY, lonmin, latmin, lonmax, latmax)
+        tileInfos.append({"url":lrTile, "xTile": lrX, "yTile": lrY,
+                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+
+    return tileInfos
+
+
+def getPixelsInTile(tileX, tileY, lonmin, latmin, lonmax, latmax):
+
+    tileXmin, tileYmin, xPixelLeft, yPixelTop = deg2num(latmax, lonmin, 8)
+    if (tileXmin == tileX):
+        xPixelMin = xPixelLeft
+    else:
+        xPixelMin = 0
+
+    #xPixelRight
+    tileXmax, tileYmax, xPixelRight, yPixelBottom = deg2num(latmin, lonmax, 8)
+    if (tileXmax == tileX):
+        xPixelMax = xPixelRight
+    else:
+        xPixelMax = 255
+
+    #yPixelTop
+    if (tileYmin == tileY):
+        yPixelMin = yPixelTop
+    else:
+        yPixelMin = 0
+
+    #yPixelBottom
+    if (tileYmax == tileY):
+        yPixelMax = yPixelBottom
+    else:
+        yPixelMax = 255
+
+    return (xPixelMin, yPixelMin, xPixelMax, yPixelMax)
+
+
+
 #gets the pixel borders for the web Mercator mapX, mapY
-def get_pixel_borders(request):
-
-    if request.GET:
-        lat = float(request.GET["lat"])
-        lon = float(request.GET["lon"])
-
-    boundaryList = []
-    tileId = 0
-
-    bigTileX, bigTileY, xPixelBig, yPixelBig = deg2num(lat, lon, 8)
-    bigTileLon = xCoordinateToLongitude(bigTileX, 8)
-    bigTileLat = yCoordinateToLatitude(bigTileY, 8)
-    lon = bigTileLon
-    lat = bigTileLat
-    startTileX, startTileY, xPixel, yPixel = deg2num(lat, lon, 16)
-
-    valuesList = getPixelValues(lat, lon, datetime.datetime(2015, 1,1))
-
-    nX = 25
-    nY = 25
-    for i in range(0, yPixelBig):
-        for j in range(0, xPixelBig):
-            tileY = startTileY + i
-            tileX = startTileX + j
-            tileId = tileId + 1
-            pixelVal = valuesList[i][j]
-            print pixelVal
-            minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
-
-            tile = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
-            boundaryList.append(tile)
-
-    context = {'boundaries':boundaryList}
-    geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
-    geojsonResponse['Content-Type'] = 'application/json;'
-    return geojsonResponse
-
 def get_pixel_borders2(request):
 
     if request.GET:
@@ -301,41 +336,35 @@ def get_pixel_borders2(request):
         latmin = float(request.GET["latmin"])
         lonmax = float(request.GET["lonmax"])
         latmax = float(request.GET["latmax"])
+        tileDate = datetime.datetime.strptime(request.GET["date"], "%Y-%m-%d")
 
-        #to get the center
-        #lon = lonmin + (lonmax - lonmin) / 2.0
-        #lat = latmin + (latmax - latmin) / 2.0
+        #to get the bottom-right
         lon = lonmax
         lat = latmin
 
         boundaryList = []
         tileId = 0
 
-        #get upper-left corner
-        bigTileXmin, bigTileYmax, xPixelBigLeft, yPixelBigTop = deg2num(latmax, lonmin, 8)
+        #check tiles in view
+        tiles = getTilesInView(lonmin, latmin, lonmax, latmax, tileDate)
+        print tiles
 
-        bigTileX, bigTileY, xPixelBig, yPixelBig = deg2num(lat, lon, 8)
-        bigTileLon = xCoordinateToLongitude(bigTileX, 8)
-        bigTileLat = yCoordinateToLatitude(bigTileY, 8)
-        lon = bigTileLon
-        lat = bigTileLat
-        startTileX, startTileY, xPixel, yPixel = deg2num(lat, lon, 16)
+        #for each tile...
+        for tile in tiles:
+            bigTileLon = xCoordinateToLongitude(tile["xTile"], 8)
+            bigTileLat = yCoordinateToLatitude(tile["yTile"], 8)
 
-        valuesList = getPixelValues(lat, lon, datetime.datetime(2015, 1,1))
-
-        nX = 255
-        nY = 255
-        for i in range(yPixelBigTop, yPixelBig):
-            for j in range(xPixelBigLeft, xPixelBig):
-                tileY = startTileY + i
-                tileX = startTileX + j
-                tileId = tileId + 1
-                pixelVal = valuesList[i][j]
-                print pixelVal
-                minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
-                if minX > lon:
-                    tile = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
-                    boundaryList.append(tile)
+            startTileX, startTileY, xPixel, yPixel = deg2num(bigTileLat, bigTileLon, 16)
+            vals = getImageVals(tile["url"])
+            for i in range(tile["yPixelTop"], tile["yPixelBottom"] + 1):
+                for j in range(tile["xPixelLeft"], tile["xPixelRight"] + 1):
+                    tileY = startTileY + i
+                    tileX = startTileX + j
+                    tileId = tileId + 1
+                    pixelVal = vals[i][j]
+                    minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
+                    pixel = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
+                    boundaryList.append(pixel)
 
         context = {'boundaries':boundaryList}
         geojsonResponse = render_to_response('snow_inspector/geojson.json', context)

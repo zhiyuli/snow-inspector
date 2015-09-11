@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
-
+from tethys_sdk.gizmos import SelectInput
 from .model import SessionMaker, SnowSite
 import json
 import datetime
@@ -57,6 +57,13 @@ def map(request):
                    'width': '100%',
                    'input_overlays': geojson_sites}
 
+
+    map_picker = SelectInput(display_text='Select2',
+                            name='select1',
+                            multiple=False,
+                            options=[('One', '1'), ('Two', '2'), ('Three', '3')],
+                            original=['Two'])
+
     #configure the date picker
     
     date_picker = {'display_text': 'Date',
@@ -88,7 +95,8 @@ def map(request):
                'date_picker':date_picker,
                'days_picker':days_picker,
                'lon_picker':lon_picker,
-               'lat_picker':lat_picker}
+               'lat_picker':lat_picker,
+               'basemap_picker':map_picker}
     
     return render(request, 'snow_inspector/map.html', context)
 

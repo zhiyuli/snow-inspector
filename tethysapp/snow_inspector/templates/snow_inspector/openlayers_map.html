@@ -42,7 +42,13 @@
    
     <p>Click on the map to change snow location. Then click GET SNOW! to show snow history.
       <input type="button" id="btnShowPixels" name="btnShowPixels" value="Show Pixels" />
-      <input type="button" id="btnShowModis" name="btnShowModis" value="Show Modis Layer" />
+      <input type="button" id="btnShowModis" name="btnShowModis" value="Hide Modis Layer" />
+      <select id="selectBaseMap">
+        <option value="esri">Esri</option>
+        <option value="mapquest">MapQuest</option>
+        <option value="bing">Bing</option>
+        <option value="osm">OpenStreetMap</option>
+      </select>
     </p>
     <div id="map_view_outer_container">
       <div class="row">
