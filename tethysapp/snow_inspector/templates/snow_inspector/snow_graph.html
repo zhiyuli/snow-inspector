@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block app_actions %}
-  <a href="{% url 'snow_inspector:home' %}" class="btn btn-default">Back</a>
+  <a class="btn btn-default" href="{% url 'snow_inspector:map' %}{{map_url}}">Back</a>
   <a id="waterml-link" target="_blank" href="{% url 'snow_inspector:waterml' %}{{waterml_url}}" class="btn btn-default">Get WaterML</a>
 {% endblock %}
 

@@ -25,7 +25,6 @@ def map(request):
         print 'request.GET!'
         lat = request.GET['lat']
         lon = request.GET['lon']
-        numdays = int(request.GET['days'])
         endDate = request.GET['end']
         today = endDate.strptime('%Y-%m-%d')
         print 'days: ' + str(numdays)
@@ -39,7 +38,6 @@ def map(request):
         lat = site.latitude
         lon = site.longitude
         today = datetime.date.today()
-        numdays = 100
     
     #Transform into GeoJSON format
     geometries = []
@@ -76,8 +74,7 @@ def map(request):
     }
 
     days_picker = {'display_text': 'Number of days:',
-        'name': 'inputDays',
-        'placeholder': numdays
+        'name': 'inputDays'
     }
 
     # Pre-populate lat-picker and lon_picker from model
@@ -124,22 +121,13 @@ def snow_graph(request):
         endDate = request.GET['endDate']
         endDate2 = datetime.datetime.strptime(endDate, '%Y-%m-%d')
         startDate2 = (endDate2 - datetime.timedelta(days=numdays)).strftime("%Y-%m-%d")
-
-        # Saving the last-selected site to the DB
-        session = SessionMaker()
-    
-        #Query DB for gage object
-        id = 1
-        site = session.query(SnowSite).filter(SnowSite.id==id).one()
-        site.latitude = lat
-        site.longitude = lon
-        session.commit()
+        zoom = request.GET['zoom']
 
         #Make the waterml url query string
         waterml_url = '?start=%s&end=%s&lat=%s&lon=%s' % (startDate2, endDate, lat, lon)
 
         #Make the map url query string
-        map_url = '?days=%s&end=%s&lat=%s&lon=%s' % (numdays, endDate, lat, lon)
+        map_url = '?days=%s&end=%s&lat=%s&lon=%s&zoom=%s' % (numdays, endDate, lat, lon, zoom)
 
     
     #Create template context dictionary

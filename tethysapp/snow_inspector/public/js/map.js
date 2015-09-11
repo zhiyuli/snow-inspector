@@ -2,9 +2,50 @@
 
 $(document).ready(function () {
 
+
+	var lat = 40.2380;
+	var lon = -111.5500;
+	var map_zoom = 3;
+
+
 	var modislayer = createModisLayer();
 	var pixelBoundaries;
 	var styleCache = {};
+
+	var urlParams = getUrlVars();
+
+	if (typeof urlParams !== 'undefined') {
+		console.log(urlParams);
+		url_lat = urlParams["lat"];
+		url_lon = urlParams["lon"];
+		url_date = urlParams["end"];
+		url_days = urlParams["days"];
+		url_zoom = urlParams["zoom"];
+
+		if (typeof url_days !== 'undefined') {
+			$("#inputDays").attr("placeholder", url_days)
+			console.log('setting inputDays to ' + url_days);
+		}
+		if (typeof url_lat !== 'undefined') {
+			lat = parseFloat(url_lat);
+		}
+		if (typeof url_lon !== 'undefined') {
+			lon = parseFloat(url_lon);
+		}
+		if (typeof url_date !== 'undefined') {
+			$("#endDate").val(url_date);
+			$("endDate").datepicker('update');
+		}
+		if (typeof url_zoom !== 'undefined') {
+			map_zoom = url_zoom;
+		}
+	}
+
+	//snow location point
+	var dbPoint = {
+		"type": "Point",
+		"coordinates": [lon, lat]
+	}
 
 	//build the bing map layer
 	var bing_layer = new ol.layer.Tile({
@@ -140,6 +181,18 @@ $(document).ready(function () {
 		}
     });
 
+    function getUrlVars() {
+		var vars = [], hash;
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for(var i = 0; i < hashes.length; i++)
+		{
+			hash = hashes[i].split('=');
+			vars.push(hash[0]);
+			vars[hash[0]] = hash[1];
+		}
+		return vars;
+	}
+
 
 	function createModisLayer() {
 
@@ -174,7 +227,7 @@ $(document).ready(function () {
 	});
 
 
-var source = new ol.source.Vector();
+
 
 map = new ol.Map({
 	layers: [mapQuest_layer, bing_layer, openstreet_layer, esri_layer, modislayer],
@@ -182,11 +235,11 @@ map = new ol.Map({
 	target: 'map_view',
 	view: new ol.View({
 		center: [0, 0],
-		zoom: 2
+		zoom: map_zoom
 	})
 });
 
-
+var source = new ol.source.Vector();
 var vector = new ol.layer.Vector({
   source: source,
   style: new ol.style.Style({
@@ -210,13 +263,6 @@ map.addLayer(vector);
 
 
 
-var lat = 40.2380;
-var lon = -111.5500;
-var dbPoint = {
-	"type": "Point",
-	"coordinates": [lon, lat]
-}
-
 
 
 function addPoint(coordinates){	
@@ -227,7 +273,12 @@ function addPoint(coordinates){
 	});
 	vector.getSource().clear();
 	vector.getSource().addFeature(feature);
-	$("#")
+}
+
+function addPointLonLat(coordinates){
+	var coords = ol.proj.transform(coordinates, 'EPSG:4326','EPSG:3857');
+	addPoint(coords);
+	map.getView().setCenter(coords);
 }
 
 function refreshDate(){
@@ -236,10 +287,10 @@ function refreshDate(){
 	$("#end").val(endDate);
 }
 
+var coords = [lon, lat];
+console.log(coords);
+addPointLonLat(coords);
 
-var coords = ol.proj.transform(dbPoint.coordinates, 'EPSG:4326','EPSG:3857');
-addPoint(coords);
-map.getView().setCenter(coords);
 
 $("#inputDays").val($("#inputDays").attr("placeholder"));
 $("#inputLon").val(lon);
@@ -256,6 +307,7 @@ map.on('click', function(evt) {
 	if (lonlat[0] < -180) {
 		$("#inputLon").val((360 + lonlat[0]).toFixed(6));
 	}
+	$('#zoom').val(map.getView().getZoom());
 })
 
 });
