@@ -52,7 +52,7 @@ $(document).ready(function () {
 
 		source: new ol.source.BingMaps({
 			imagerySet: 'AerialWithLabels',
-			key: 'Ak-dzM4wZjSqTlzveKz5u0d4IQ4bRzVI309GxmkgSVr1ewS6iPSrOvOKhA-CJlm3'
+			key: 'AkCPywc954jTLm72zRDvk0JpSJarnJBYPWrNYZB1X8OajN_1DuXj1p5u1Hy2betj'
 		}),
 		visibility: false
 	});
