@@ -275,16 +275,17 @@ def get_pixel_borders(request):
 
     valuesList = getPixelValues(lat, lon, datetime.datetime(2015, 1,1))
 
-    nX = 200
-    nY = 200
-    for i in range(0, nY):
-        for j in range(0, nY):
+    nX = 25
+    nY = 25
+    for i in range(0, yPixelBig):
+        for j in range(0, xPixelBig):
             tileY = startTileY + i
             tileX = startTileX + j
             tileId = tileId + 1
             pixelVal = valuesList[i][j]
             print pixelVal
             minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
+
             tile = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
             boundaryList.append(tile)
 
@@ -292,3 +293,51 @@ def get_pixel_borders(request):
     geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
     geojsonResponse['Content-Type'] = 'application/json;'
     return geojsonResponse
+
+def get_pixel_borders2(request):
+
+    if request.GET:
+        lonmin = float(request.GET["lonmin"])
+        latmin = float(request.GET["latmin"])
+        lonmax = float(request.GET["lonmax"])
+        latmax = float(request.GET["latmax"])
+
+        #to get the center
+        #lon = lonmin + (lonmax - lonmin) / 2.0
+        #lat = latmin + (latmax - latmin) / 2.0
+        lon = lonmax
+        lat = latmin
+
+        boundaryList = []
+        tileId = 0
+
+        #get upper-left corner
+        bigTileXmin, bigTileYmax, xPixelBigLeft, yPixelBigTop = deg2num(latmax, lonmin, 8)
+
+        bigTileX, bigTileY, xPixelBig, yPixelBig = deg2num(lat, lon, 8)
+        bigTileLon = xCoordinateToLongitude(bigTileX, 8)
+        bigTileLat = yCoordinateToLatitude(bigTileY, 8)
+        lon = bigTileLon
+        lat = bigTileLat
+        startTileX, startTileY, xPixel, yPixel = deg2num(lat, lon, 16)
+
+        valuesList = getPixelValues(lat, lon, datetime.datetime(2015, 1,1))
+
+        nX = 255
+        nY = 255
+        for i in range(yPixelBigTop, yPixelBig):
+            for j in range(xPixelBigLeft, xPixelBig):
+                tileY = startTileY + i
+                tileX = startTileX + j
+                tileId = tileId + 1
+                pixelVal = valuesList[i][j]
+                print pixelVal
+                minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
+                if minX > lon:
+                    tile = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
+                    boundaryList.append(tile)
+
+        context = {'boundaries':boundaryList}
+        geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
+        geojsonResponse['Content-Type'] = 'application/json;'
+        return geojsonResponse

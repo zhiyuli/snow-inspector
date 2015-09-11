@@ -40,7 +40,7 @@ class SnowInspector(TethysAppBase):
                            controller='snow_inspector.modis.get_data_for_pixel'),
                     UrlMap(name='pixel-borders',
                            url='snow-inspector/pixel-borders',
-                           controller='snow_inspector.modis.get_pixel_borders')
+                           controller='snow_inspector.modis.get_pixel_borders2')
         )
 
         return url_maps

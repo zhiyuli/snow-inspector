@@ -19,14 +19,28 @@ $(document).ready(function () {
 
 	$("#btnShowPixels").click(function(){
 		//add geojson layer with tile outlines
+		var extent = map.getView().calculateExtent(map.getSize());
+
+		var extentLatLon = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326')
+		var xmin = extentLatLon[0];
+		var ymin = extentLatLon[1];
+		var xmax = extentLatLon[2];
+		var ymax = extentLatLon[3];
+		console.log(extentLatLon);
+
 		var center = map.getView().getCenter()
 		var lonlat = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
 		var styleCache = {};
 
+		var baseurl = 'http://localhost:8000/apps/snow-inspector/pixel-borders/';
+		var xmax2 = lonlat[0] + 0.05;
+		var ymax2 = lonlat[1] + 0.05;
+		var pixel_url = baseurl +'?lonmin=' + xmin + '&latmin=' + ymin + '&lonmax=' + xmax + '&latmax=' + ymax;
+
 		var pixelBoundaries = new ol.layer.Vector({
 			source : new ol.source.GeoJSON({
 				projection : 'EPSG:3857',
-				url : 'http://localhost:8000/apps/snow-inspector/pixel-borders/?lon=' + lonlat[0] + '&lat=' + lonlat[1]
+				url : pixel_url
 			}),
 			style : function(feature, resolution) {
 		var text = feature.get('val');
