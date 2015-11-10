@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
-from tethys_sdk.gizmos import SelectInput
 from .model import SessionMaker, SnowSite
 import json
 import datetime
@@ -56,11 +55,6 @@ def map(request):
                    'input_overlays': geojson_sites}
 
 
-    map_picker = SelectInput(display_text='Select2',
-                            name='select1',
-                            multiple=False,
-                            options=[('One', '1'), ('Two', '2'), ('Three', '3')],
-                            original=['Two'])
 
     #configure the date picker
     
