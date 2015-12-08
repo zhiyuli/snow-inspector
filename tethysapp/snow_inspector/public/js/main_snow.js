@@ -206,6 +206,22 @@ chart_options.series[0].type = 'line';
 chart_options.series[0].name = 'Snow Coverage';
 chart = new Highcharts.Chart(chart_options);
 
+	//setup some default values
+	var resTitle = 'MODIS Snow coverage at ' + lon + ', ' + lat;
+
+	var resAbstr = 'This resource contains an automatically created WaterML representing a time series of fractional snow cover ' +
+            'from the MODIS TERRA MOD10_L3 data set at lat: ' + lat + ', lon: ' + lon + ' in the time period: ' + begin_date +
+			' - ' + end_date + '. It was retrieved from the NASA GIBS web service and ' +
+			'processed using the MODIS Snow Inspector application.';
+
+
+    var resKwds = 'snow, MODIS';
+
+	$("#resource-title").val(resTitle);
+	$("#resource-abstract").val(resAbstr);
+	$("#resource-keywords").val(resKwds);
+
 update_chart(lat, lon, begin_date, end_date);
+
 
 });

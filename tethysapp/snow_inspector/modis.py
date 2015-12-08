@@ -1,11 +1,24 @@
-from django.http import JsonResponse
-from django.shortcuts import render_to_response
+import tempfile
+import shutil
+import os
+import traceback
 import json
 import math
 import datetime
 import png
 import urllib2
-from global_mercator import GlobalMercator
+
+from hs_restclient import HydroShare, HydroShareAuthBasic
+from oauthlib.oauth2 import TokenExpiredError
+from hs_restclient import HydroShare, HydroShareAuthOAuth2, HydroShareNotAuthorized, HydroShareNotFound
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.contrib.auth.decorators import login_required
+from social_auth.models import UserSocialAuth
+from django.conf import settings
+
 
 
 """
@@ -52,7 +65,6 @@ def getTimeSeries(lat, lon, beginDate, endDate):
     ts = []
     for d in datelist:        
         url = getTileURL(xtile, ytile, zoom, d)
-        print url
         snow_val = getImage(url, ypixel, xpixel)
         if snow_val > 100:
             snow_val = None
@@ -67,7 +79,6 @@ def getTimeSeries2(lat, lon, beginDate, endDate, zoom):
     ts = []
     for d in datelist:        
         url = getTileURL(xtile, ytile, zoom, d)
-        print url
         snow_val = getImage(url, ypixel, xpixel)
         if snow_val > 100:
             snow_val = None
@@ -172,8 +183,6 @@ def get_data_for_pixel(request):
     zoom = 16
     lon = xCoordinateToLongitude(x, zoom)
     lat = yCoordinateToLatitude(y, zoom)
-    print lat
-    print lon
     ts = getTimeSeries(lat, lon, startdate, enddate)
     nodata_value = -9999
     time_series = format_time_series(startdate, ts, nodata_value)
@@ -347,7 +356,6 @@ def get_pixel_borders2(request):
 
         #check tiles in view
         tiles = getTilesInView(lonmin, latmin, lonmax, latmax, tileDate)
-        print tiles
 
         #for each tile...
         for tile in tiles:

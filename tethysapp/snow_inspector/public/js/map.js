@@ -1,11 +1,11 @@
-
+var popupDiv = $('#welcome-popup');
 
 $(document).ready(function () {
 
 
 	var lat = 40.2380;
 	var lon = -111.5500;
-	var map_zoom = 3;
+	var map_zoom = 5;
 
 
 	var modislayer = createModisLayer();
@@ -14,8 +14,14 @@ $(document).ready(function () {
 
 	var urlParams = getUrlVars();
 
+
+
 	if (typeof urlParams !== 'undefined') {
-		console.log(urlParams);
+
+		if (urlParams.length < 2) {
+			popupDiv.modal('show');
+		}
+
 		url_lat = urlParams["lat"];
 		url_lon = urlParams["lon"];
 		url_date = urlParams["end"];
@@ -23,8 +29,7 @@ $(document).ready(function () {
 		url_zoom = urlParams["zoom"];
 
 		if (typeof url_days !== 'undefined') {
-			$("#inputDays").attr("placeholder", url_days)
-			console.log('setting inputDays to ' + url_days);
+			$("#inputDays").attr("placeholder", url_days);
 		}
 		if (typeof url_lat !== 'undefined') {
 			lat = parseFloat(url_lat);
@@ -38,7 +43,11 @@ $(document).ready(function () {
 		}
 		if (typeof url_zoom !== 'undefined') {
 			map_zoom = url_zoom;
+		} else {
+			map_zoom = 5;
 		}
+	} else {
+		popupDiv.modal('show');
 	}
 
 	//snow location point
@@ -295,6 +304,7 @@ addPointLonLat(coords);
 $("#inputDays").val($("#inputDays").attr("placeholder"));
 $("#inputLon").val(lon);
 $("#inputLat").val(lat);
+$('#zoom').val(map.getView().getZoom());
 
 map.on('click', function(evt) {
 	var coordinate = evt.coordinate;

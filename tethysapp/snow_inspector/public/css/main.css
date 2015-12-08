@@ -8,3 +8,34 @@
 	position: relative;
 	margin: 20px;
 }
+
+#submit-warning {
+    color: red;
+    font-weight: bold;
+}
+.bootstrap-tagsinput, #resource-type {
+    width: 100%;
+}
+.error {
+    background-color: red;
+    color: white;
+    text-align: center;
+    border-radius: 4%;
+}
+.uploading {
+    background-color: yellow;
+    color: darkblue;
+    text-align: center;
+}
+.hide-search {
+    display: none !important;
+}
+.success {
+    background-color: green;
+    color: white;
+    text-align: center;
+    border-radius: 4%;
+}
+.checkbox {
+     text-indent: 15px;
+}

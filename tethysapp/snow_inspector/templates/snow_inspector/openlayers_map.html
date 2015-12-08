@@ -23,7 +23,9 @@
 
 
 {% block app_navigation_items %}
-<form method="get" action="../snow_graph/">
+<form method="get" action="snow_graph/">
+  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#welcome-popup">Instructions</button>
+<br><br>
   <li>
     {% gizmo date_picker date_picker %}
     {% gizmo text_input days_picker %}
@@ -39,6 +41,51 @@
 
 </form>
 {% endblock %}
+
+
+{% block app_content_wrapper_override %}
+<!-- Modal  -->
+<div class="modal fade" id="welcome-popup" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Welcome to the MODIS snow inspector!</h4>
+            </div>
+            <div class="modal-body">
+                <div id="welcome-info">
+                    <ol>
+                        <h6>1. Select time period</h6>
+                        <p>Choose the date and the length of the time period in days.</p>
+                        <h6>2. Select point of interest</h6>
+                        <p>Click the map or enter coordinates to select the point of interest.</p>
+                        <h6>3. Get snow time series</h6>
+                        <p>Click the Get Snow button to show a time-series graph.</p>
+                        <h6>4. Download Results</h6>
+                        <p>
+                           Click the "Get WaterML" to save results as a WaterML file.
+                        </p>
+                        <h6>5. Upload to HydroShare</h6>
+                        <p>Click the "Upload to HydroShare" and fill out the meatadata form. </p>
+
+                        <h9>Note: The original data is retrieve from map tiles of the
+                          <a href="http://earthdata.nasa.gov/about-eosdis/science-system-description/eosdis-components/global-imagery-browse-services-gibs">
+                            NASA Global Imagery Browse Service (GIBS)</a> based on the MOD10_L3 swath daily fractional snow cover dataset.
+    For more info and source code, check our <a href="http://github.com/jirikadlec2/snow-inspector">source code</a> at GitHub
+                        </h9>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="close-popup" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
+{{block.super}}
+{% endblock %}
+
 
 {% block app_content %}
    
