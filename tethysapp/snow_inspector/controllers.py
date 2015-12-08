@@ -189,7 +189,7 @@ def upload_to_hydroshare(request):
             #download the kml file to a temp directory
             temp_dir = tempfile.mkdtemp()
 
-            waterml_file_path = os.path.join(temp_dir, "snow.xml")
+            waterml_file_path = os.path.join(temp_dir, "snow.wml")
             print waterml_file_path
 
             urllib.urlretrieve(waterml_url, waterml_file_path)
