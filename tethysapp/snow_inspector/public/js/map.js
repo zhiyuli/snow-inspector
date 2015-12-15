@@ -58,7 +58,6 @@ $(document).ready(function () {
 
 	//build the bing map layer
 	var bing_layer = new ol.layer.Tile({
-
 		source: new ol.source.BingMaps({
 			imagerySet: 'AerialWithLabels',
 			key: 'AkCPywc954jTLm72zRDvk0JpSJarnJBYPWrNYZB1X8OajN_1DuXj1p5u1Hy2betj'
@@ -70,13 +69,13 @@ $(document).ready(function () {
     var openstreet_layer = new ol.layer.Tile({
           source: new ol.source.OSM(),
           visibility: false
-        });
+	});
 
     //build MapQuest map layer
     var mapQuest_layer = new ol.layer.Tile({
         source: new ol.source.MapQuest({layer: 'sat'}),
         visibility: false
-                 });
+	});
 
     //build Esri map layer
     var esri_layer = new ol.layer.Tile({

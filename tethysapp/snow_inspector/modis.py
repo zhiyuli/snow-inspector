@@ -370,6 +370,14 @@ def get_pixel_borders2(request):
                     tileX = startTileX + j
                     tileId = tileId + 1
                     pixelVal = vals[i][j]
+
+                    # special value for cloud..
+                    print "pixel value: %s " % pixelVal
+                    if pixelVal > 100:
+                        pixelVal = "C"
+                    if pixelVal == "250":
+                        pixelVal = "C"
+
                     minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
                     pixel = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
                     boundaryList.append(pixel)

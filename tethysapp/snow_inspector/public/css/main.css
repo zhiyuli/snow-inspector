@@ -39,3 +39,12 @@
 .checkbox {
      text-indent: 15px;
 }
+
+.ol-mouse-position {
+      top: 10px;
+      right: 40px;
+}
+
+#detail-map {
+    height: 500px;
+}
