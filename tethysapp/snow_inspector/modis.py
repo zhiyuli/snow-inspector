@@ -357,6 +357,10 @@ def get_pixel_borders2(request):
         #check tiles in view
         tiles = getTilesInView(lonmin, latmin, lonmax, latmax, tileDate)
 
+        #json feature list
+        featureList = {"type":"FeatureCollection", "features":[]}
+
+
         #for each tile...
         for tile in tiles:
             bigTileLon = xCoordinateToLongitude(tile["xTile"], 8)
@@ -372,17 +376,32 @@ def get_pixel_borders2(request):
                     pixelVal = vals[i][j]
 
                     # special value for cloud..
-                    print "pixel value: %s " % pixelVal
+
                     if pixelVal > 100:
-                        pixelVal = "C"
-                    if pixelVal == "250":
                         pixelVal = "C"
 
                     minX, minY, maxX, maxY = tileBoundsLonLat(tileX, tileY, 16)
                     pixel = {"id": tileId, "pixelval": pixelVal, "minX": minX, "minY": minY, "maxX": maxX, "maxY": maxY}
                     boundaryList.append(pixel)
 
-        context = {'boundaries':boundaryList}
-        geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
-        geojsonResponse['Content-Type'] = 'application/json;'
-        return geojsonResponse
+                    newF = {
+                        "type": "Feature",
+                        "properties": {
+                            "id": tileId,
+                            "val": pixelVal
+                        },
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[
+                                [minX, minY], [maxX, minY], [maxX, maxY], [minX, maxY], [minX, minY]
+                            ]]
+                        }
+                    }
+                    featureList["features"].append(newF)
+
+        return JsonResponse(featureList)
+
+        #context = {'boundaries':boundaryList}
+        #geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
+        #geojsonResponse['Content-Type'] = 'application/json;'
+        #return geojsonResponse

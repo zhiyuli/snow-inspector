@@ -12,7 +12,6 @@ import urllib
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
-from .model import SessionMaker, SnowSite
 from tethys_gizmos.gizmo_options import MapView, MVLayer, MVView
 from tethys_apps.sdk.gizmos import Button, TextInput, SelectInput
 from hs_restclient import HydroShare, HydroShareAuthBasic
