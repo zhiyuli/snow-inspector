@@ -102,8 +102,10 @@ $(document).ready(function () {
 		}
 	})
 
-	$("#btnShowPixels").click(function(){
-		//add geojson layer with tile outlines
+
+	//add geojson layer with tile outlines
+	function add_pixel_boundaries() {
+
 		var extent = map.getView().calculateExtent(map.getSize());
 
 		var extentLatLon = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326')
@@ -159,12 +161,27 @@ $(document).ready(function () {
 		} else {
 			pixelBoundaries.setSource(pixel_source);
 		}
+	}
+
+
+	$("#btnShowPixels").click(function(){
+
+		//changing the button text...
+		if ($("#btnShowPixels").val() == 'Show Pixels') {
+			add_pixel_boundaries();
+			$("#btnShowPixels").val('Hide Pixels');
+
+		} else {
+			if (typeof pixelBoundaries !== 'undefined') {
+				pixelBoundaries.getSource().clear();
+			}
+			$("#btnShowPixels").val('Show Pixels');
+		}
 	});
 
 
 	$("#selectBaseMap").change(function () {
         var selected_value = this.value;
-        console.log(selected_value);
 
 		if (selected_value == "bing") {
 			esri_layer.setVisible(false);
@@ -187,6 +204,8 @@ $(document).ready(function () {
 			openstreet_layer.setVisible(false);
 			esri_layer.setVisible(true);
 		}
+		// save the selected value
+		$('#layer').val(selected_value);
     });
 
     function getUrlVars() {
@@ -229,12 +248,26 @@ $(document).ready(function () {
 		modislayer.setSource(modisSource);
 	}
 
+	function configure_show_pixels(newZoom) {
+		if (newZoom < 13) {
+			if ($('#btnShowPixels').is(":visible")) {
+				$('#btnShowPixels').hide();
+			}
+			if (typeof pixelBoundaries !== 'undefined') {
+				pixelBoundaries.getSource().clear();
+			}
+		}
+		if (newZoom >= 13) {
+		  if (!($('#btnShowPixels').is(":visible"))) {
+				$('#btnShowPixels').show();
+		  }
+		}
+	}
+
 	$('#endDate').datepicker().on('changeDate', function (ev) {
     	console.log('date changed!');
     	updateModisLayer();
 	});
-
-
 
 
 map = new ol.Map({
@@ -246,6 +279,22 @@ map = new ol.Map({
 		zoom: map_zoom
 	})
 });
+
+	// checking zoom end
+	map.getView().on('propertychange', function(e) {
+	   switch (e.key) {
+		  case 'resolution':
+			  console.log('zoom changed!');
+			  var newZoom = map.getView().getZoom();
+			  console.log(newZoom);
+			  $('#zoom').val(newZoom);
+
+			  configure_show_pixels(newZoom);
+			  break;
+
+
+	   }
+	});
 
 var source = new ol.source.Vector();
 var vector = new ol.layer.Vector({
@@ -268,7 +317,7 @@ var vector = new ol.layer.Vector({
 });
 
 map.addLayer(vector);
-
+configure_show_pixels(map.getView().getZoom());
 
 
 

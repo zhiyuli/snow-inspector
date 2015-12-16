@@ -48,3 +48,23 @@
 #detail-map {
     height: 500px;
 }
+
+#inputDays {
+    width: 250px;
+}
+
+#endDate {
+    width: 250px;
+}
+
+#getsnow {
+    width: 250px;
+}
+
+#inputLat {
+    width: 120px;
+}
+
+#inputLon {
+    width: 120px;
+}

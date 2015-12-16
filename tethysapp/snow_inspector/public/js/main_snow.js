@@ -234,22 +234,68 @@ function add_snow_pixels_to_map(map, map_date) {
 }
 
 
+function make_base_layer() {
+
+	var params = getUrlVars();
+	var layerName = params.layer;
+	console.log(layerName);
+
+	// build the BING Map layer
+	if (layerName === 'bing') {
+		var bing_layer = new ol.layer.Tile({
+			source: new ol.source.BingMaps({
+				imagerySet: 'AerialWithLabels',
+				key: 'AkCPywc954jTLm72zRDvk0JpSJarnJBYPWrNYZB1X8OajN_1DuXj1p5u1Hy2betj'
+			})
+		})
+		return bing_layer;
+	}
+
+    //build OpenStreet map layer
+	if (layerName == 'osm') {
+		var openstreet_layer = new ol.layer.Tile({
+			source: new ol.source.OSM()
+		});
+		return openstreet_layer;
+	}
+
+    //build MapQuest map layer
+	if (layerName == 'mapQuest') {
+		var mapQuest_layer = new ol.layer.Tile({
+			source: new ol.source.MapQuest({layer: 'sat'})
+		});
+		return mapQuest_layer;
+	}
+
+    //default option: build Esri map layer
+	layerName = 'esri';
+	if (layerName == 'esri') {
+		var esri_layer = new ol.layer.Tile({
+			source: new ol.source.XYZ({
+				attribution: [new ol.Attribution({
+					html: 'Tiles &copy; <a href="http://services.arcgisonline.com/ArcGIS/' +
+					'rest/services/World_Topo_Map/MapServer>ArcGIS</a>'
+				})],
+				url: 'http://server.arcgisonline.com/ArcGIS/rest/services/' +
+				'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
+			})
+		});
+		return esri_layer;
+	}
+}
+
+
 $(document).ready(function () {
 
-	// setting up the map centered on snow location
-    var mapQuest_layer = new ol.layer.Tile({
-        source: new ol.source.MapQuest({layer: 'sat'}),
-        visibility: false
-	});
-
+	var base_layer = make_base_layer();
 	var snow_point_layer = make_point_layer();
 	var map = new ol.Map({
-		layers: [mapQuest_layer, snow_point_layer],
+		layers: [base_layer, snow_point_layer],
 		controls: ol.control.defaults(),
 		target: 'detail-map',
 		view: new ol.View({
 			center: [0, 0],
-			zoom: 13
+			zoom: 14
 		})
 	});
 
@@ -312,10 +358,18 @@ $(document).ready(function () {
 		plotOptions: {
 			series: {
 				cursor: 'pointer',
+				allowPointSelect: true,
 				point: {
 					events: {
 						click: function (e) {
+							// mouse click event
 							console.log('you clicked the chart!');
+							var selected_date = Highcharts.dateFormat('%Y-%m-%d', this.x);
+							add_snow_pixels_to_map(map, selected_date);
+						},
+						mouseOver: function() {
+							// mouse hover event
+							console.log('mouse over!');
 							var selected_date = Highcharts.dateFormat('%Y-%m-%d', this.x);
 							add_snow_pixels_to_map(map, selected_date);
 						}
@@ -325,7 +379,14 @@ $(document).ready(function () {
 			line: {
 				color: Highcharts.getOptions().colors[0],
 				marker: {
-					radius: 2
+					radius: 2,
+					states: {
+                		select: {
+                    		fillColor: 'red',
+                    		lineWidth: 0,
+							radius: 4
+                		}
+            		}
 				},
 				lineWidth: 1,
 				states: {

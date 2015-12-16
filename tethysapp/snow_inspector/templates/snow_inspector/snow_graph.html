@@ -15,13 +15,17 @@
 {% endblock %}
 
 {% block app_navigation_items %} 
-	<li><a href="{% url 'snow_inspector:home' %}{{map_url}}">Map Input</a></li>
+	<li><button type="button" class="btn btn-default">
+        <a href="{% url 'snow_inspector:home' %}{{map_url}}">Change Snow Location</a>
+        </button>
+    </li>
+    <p></p>
     <div id="detail-map"></div>
 {% endblock %}
 
 {% block app_content %}
-  <p>Snow Graph For: <span id="lat">{{lat}}</span> <span id="lon">{{lon}}</span></p>
-  <p>time period: <span id="startDate">{{startDate}}</span>&nbsp;-&nbsp;<span id="endDate">{{endDate}}</span></p>
+  <p>Snow Graph For: <i><span id="lat">{{lat}}</span> <span id="lon">{{lon}}</span></i>
+  &nbsp;time period: <span id="startDate">{{startDate}}</span>&nbsp;-&nbsp;<span id="endDate">{{endDate}}</span></p>
 
   <div id="snow-chart"></div> 
 {% endblock %}

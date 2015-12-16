@@ -29,14 +29,20 @@
   <li>
     {% gizmo date_picker date_picker %}
     {% gizmo text_input days_picker %}
-    {% gizmo text_input lat_picker %}
-    {% gizmo text_input lon_picker %}
+      <table>
+          <tr>
+              <td>{% gizmo text_input lat_picker %}</td>
+              <td width="10px"></td>
+              <td>{% gizmo text_input lon_picker %}</td>
+          </tr>
+      </table>
   </li>
 
   <input type='hidden' id='end' name='end'></input>
   <input type='hidden' id='zoom' name='zoom'></input>
+  <input type='hidden' id='layer' name='layer'></input>
 
-  <input type="submit" value="GET SNOW!" name="name-form-submit" class="btn btn-default">
+  <input type="submit" id='getsnow' value="GET SNOW!" name='getsnow' class="btn btn-default">
   </li>
 
 </form>
@@ -89,9 +95,10 @@
 
 {% block app_content %}
    
-    <p>Click on the map to change snow location. Then click GET SNOW! to show snow history.
+    <p>Click on the map to select location. Then click GET SNOW! to show snow history.
       <input type="button" id="btnShowPixels" name="btnShowPixels" value="Show Pixels" />
       <input type="button" id="btnShowModis" name="btnShowModis" value="Hide Modis Layer" />
+        &nbsp;Base Map:
       <select id="selectBaseMap">
         <option value="esri">Esri</option>
         <option value="mapquest">MapQuest</option>
