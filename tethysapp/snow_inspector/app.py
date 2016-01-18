@@ -13,6 +13,7 @@ class SnowInspector(TethysAppBase):
     package = 'snow_inspector'
     root_url = 'snow-inspector'
     color = '#9b59b6'
+    description = 'Check the snow cover anywhere in the world.'
         
     def url_maps(self):
         """
@@ -22,9 +23,6 @@ class SnowInspector(TethysAppBase):
 
         url_maps = (UrlMap(name='home',
                            url='snow-inspector',
-                           controller='snow_inspector.controllers.home'),
-                    UrlMap(name='map',
-                           url='snow-inspector/map',
                            controller='snow_inspector.map.map'),
                     UrlMap(name='snow_graph',
                            url='snow-inspector/snow_graph',
@@ -37,7 +35,13 @@ class SnowInspector(TethysAppBase):
                            controller='snow_inspector.modis.get_data_waterml'),
                     UrlMap(name='pixel',
                            url='snow-inspector/pixel',
-                           controller='snow_inspector.modis.get_data_for_pixel')
+                           controller='snow_inspector.modis.get_data_for_pixel'),
+                    UrlMap(name='pixel-borders',
+                           url='snow-inspector/pixel-borders',
+                           controller='snow_inspector.modis.get_pixel_borders2'),
+                    UrlMap(name='upload_to_hydroshare_ajax',
+                           url='snow-inspector/upload-to-hydroshare',
+                           controller='snow_inspector.controllers.upload_to_hydroshare')
         )
 
         return url_maps

@@ -2,3 +2,5 @@
 *.py~
 *.js~
 *.html~
+.idea/*
+.build/*
