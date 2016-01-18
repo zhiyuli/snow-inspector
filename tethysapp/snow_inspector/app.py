@@ -13,6 +13,7 @@ class SnowInspector(TethysAppBase):
     package = 'snow_inspector'
     root_url = 'snow-inspector'
     color = '#9b59b6'
+    description = 'Check the snow cover anywhere in the world.'
         
     def url_maps(self):
         """
