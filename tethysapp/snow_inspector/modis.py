@@ -253,12 +253,8 @@ def get_data_waterml(request):
     context = {'lat':lat, 'lon':lon, 'startdate':start, 'enddate':end, 'site_name':site_name, 'time_series':time_series}
 
     xmlResponse = render_to_response('snow_inspector/waterml.xml', context)
-<<<<<<< HEAD
     xmlResponse['Content-Type'] = 'application/xml'
     xmlResponse['content-disposition'] = "attachment; filename=output-time-series.xml"
-    return xmlResponse
-=======
-    xmlResponse['Content-Type'] = 'application/xml;'
     return xmlResponse
 
 
@@ -410,4 +406,3 @@ def get_pixel_borders2(request):
         #geojsonResponse = render_to_response('snow_inspector/geojson.json', context)
         #geojsonResponse['Content-Type'] = 'application/json;'
         #return geojsonResponse
->>>>>>> master
