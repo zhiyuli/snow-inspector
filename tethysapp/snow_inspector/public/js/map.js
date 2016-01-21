@@ -19,7 +19,11 @@ $(document).ready(function () {
 	if (typeof urlParams !== 'undefined') {
 
 		if (urlParams.length < 2) {
+			if (document.referrer == "https://apps.hydroshare.org/apps/") {
+				$('#extra-buttons').append('<a class="btn btn-default btn-sm" href="https://apps.hydroshare.org/apps/">Return to HydroShare Apps</a>');
+			}
 			popupDiv.modal('show');
+
 		}
 
 		url_lat = urlParams["lat"];
