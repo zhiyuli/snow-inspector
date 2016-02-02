@@ -16,7 +16,6 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-from social_auth.models import UserSocialAuth
 from django.conf import settings
 
 
