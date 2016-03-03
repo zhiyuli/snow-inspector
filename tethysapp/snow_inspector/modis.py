@@ -269,9 +269,8 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     ulTile = getTileURL(ulX, ulY, zoom, tileDate)
     tiles.append(ulTile)
     (xLeft, yTop, xRight, yBottom) = getPixelsInTile(ulX, ulY, lonmin, latmin, lonmax, latmax)
-    tileInfos.append({"url":ulTile, "xTile": ulX, "yTile": ulY,
+    tile_ul = ({"url":ulTile, "xTile": ulX, "yTile": ulY,
                       "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
-
 
     #upper right
     urX, urY, urpixelX, urpixelY = deg2num(latmax, lonmax, zoom)
@@ -279,9 +278,8 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     if not urTile in tiles:
         tiles.append(urTile)
         (xLeft, yTop, xRight, yBottom) = getPixelsInTile(urX, urY, lonmin, latmin, lonmax, latmax)
-        tileInfos.append({"url":urTile, "xTile": urX, "yTile": urY,
+        tile_ur = ({"url":urTile, "xTile": urX, "yTile": urY,
                           "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
-
 
     #lower left
     llX, llY, llpixelX, llpixelY = deg2num(latmin, lonmin, zoom)
@@ -289,10 +287,8 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     if not llTile in tiles:
         tiles.append(llTile)
         (xLeft, yTop, xRight, yBottom) = getPixelsInTile(llX, llY, lonmin, latmin, lonmax, latmax)
-        tileInfos.append({"url":llTile, "xTile": llX, "yTile": llY,
+        tile_ll = ({"url":llTile, "xTile": llX, "yTile": llY,
                           "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
-
-
 
     #lower right
     lrX, lrY, lrpixelX, lrpixelY = deg2num(latmin, lonmax, zoom)
@@ -300,8 +296,33 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     if not lrTile in tiles:
         tiles.append(lrTile)
         (xLeft, yTop, xRight, yBottom) = getPixelsInTile(lrX, lrY, lonmin, latmin, lonmax, latmax)
-        tileInfos.append({"url":lrTile, "xTile": lrX, "yTile": lrY,
+        tile_lr = ({"url":lrTile, "xTile": lrX, "yTile": lrY,
                           "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+
+    #in between
+    tileMinRow = tile_ul['yTile']
+    tileMaxRow = tile_ll['yTile']
+    tileMinCol = tile_ul['xTile']
+    tileMaxCol = tile_ur['xTile']
+
+    print tileMinRow
+    print tileMaxRow
+    print tileMinCol
+    print tileMaxCol
+
+    nTileCols = tileMaxCol - tileMinCol + 1
+    nTileRows = tileMaxRow - tileMinRow + 1
+    print nTileRows
+    print nTileCols
+
+    for tileRow in range(tileMinRow, tileMaxRow + 1):
+        for tileCol in range(tileMinCol, tileMaxCol + 1):
+            tileURL = getTileURL(tileCol, tileRow, zoom, tileDate)
+            (xLeft, yTop, xRight, yBottom) = getPixelsInTile(tileCol, tileRow, lonmin, latmin, lonmax, latmax)
+            tileInfo = ({"url":tileURL, "xTile": tileCol, "yTile": tileRow,
+                          "xPixelLeft": xLeft, "yPixelTop": yTop, "xPixelRight": xRight, "yPixelBottom": yBottom})
+            tiles.append(tileURL)
+            tileInfos.append(tileInfo)
 
     return tileInfos
 
