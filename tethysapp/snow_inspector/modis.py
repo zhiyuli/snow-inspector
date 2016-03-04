@@ -267,7 +267,6 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     #upper left
     ulX, ulY, ulpixelXUL, ulpixelYUL = deg2num(latmax, lonmin, zoom)
     ulTile = getTileURL(ulX, ulY, zoom, tileDate)
-    tiles.append(ulTile)
     (xLeft, yTop, xRight, yBottom) = getPixelsInTile(ulX, ulY, lonmin, latmin, lonmax, latmax)
     tile_ul = ({"url":ulTile, "xTile": ulX, "yTile": ulY,
                       "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
@@ -275,29 +274,23 @@ def getTilesInView(lonmin, latmin, lonmax, latmax, tileDate):
     #upper right
     urX, urY, urpixelX, urpixelY = deg2num(latmax, lonmax, zoom)
     urTile = getTileURL(urX, urY, zoom, tileDate)
-    if not urTile in tiles:
-        tiles.append(urTile)
-        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(urX, urY, lonmin, latmin, lonmax, latmax)
-        tile_ur = ({"url":urTile, "xTile": urX, "yTile": urY,
-                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+    (xLeft, yTop, xRight, yBottom) = getPixelsInTile(urX, urY, lonmin, latmin, lonmax, latmax)
+    tile_ur = ({"url":urTile, "xTile": urX, "yTile": urY,
+                        "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
 
     #lower left
     llX, llY, llpixelX, llpixelY = deg2num(latmin, lonmin, zoom)
     llTile = getTileURL(llX, llY, zoom, tileDate)
-    if not llTile in tiles:
-        tiles.append(llTile)
-        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(llX, llY, lonmin, latmin, lonmax, latmax)
-        tile_ll = ({"url":llTile, "xTile": llX, "yTile": llY,
-                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+    (xLeft, yTop, xRight, yBottom) = getPixelsInTile(llX, llY, lonmin, latmin, lonmax, latmax)
+    tile_ll = ({"url":llTile, "xTile": llX, "yTile": llY,
+                        "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
 
     #lower right
     lrX, lrY, lrpixelX, lrpixelY = deg2num(latmin, lonmax, zoom)
     lrTile = getTileURL(lrX, lrY, zoom, tileDate)
-    if not lrTile in tiles:
-        tiles.append(lrTile)
-        (xLeft, yTop, xRight, yBottom) = getPixelsInTile(lrX, lrY, lonmin, latmin, lonmax, latmax)
-        tile_lr = ({"url":lrTile, "xTile": lrX, "yTile": lrY,
-                          "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
+    (xLeft, yTop, xRight, yBottom) = getPixelsInTile(lrX, lrY, lonmin, latmin, lonmax, latmax)
+    tile_lr = ({"url":lrTile, "xTile": lrX, "yTile": lrY,
+                        "xPixelLeft":xLeft, "yPixelTop":yTop, "xPixelRight":xRight, "yPixelBottom":yBottom})
 
     #in between
     tileMinRow = tile_ul['yTile']
