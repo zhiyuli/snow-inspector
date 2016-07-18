@@ -8,44 +8,36 @@ $('#hydroshare-proceed').on('click', function ()  {
 
     //now we construct the WaterML..
     var waterml_link = $("#waterml-link").attr("href");
-    var upload_link = waterml_link.replace('waterml', 'upload-to-hydroshare');
+    var upload_link = '/apps/snow-inspector/upload-to-hydroshare/';
 
     displayStatus.removeClass('error');
     displayStatus.addClass('uploading');
     displayStatus.html('<em>Uploading...</em>');
-    var resourceTypeSwitch = function(typeSelection) {
-        var options = {
-            'Generic': 'GenericResource',
-            'Geographic Raster': 'RasterResource',
-            'HIS Referenced Time Series': 'RefTimeSeries',
-            'Model Instance': 'ModelInstanceResource',
-            'Model Program': 'ModelProgramResource',
-            'Multidimensional (NetCDF)': 'NetcdfResource',
-            'Time Series': 'TimeSeriesResource',
-            'Application': 'ToolResource'
-        };
-        return options[typeSelection];
-    };
 
     var resourceAbstract = $('#resource-abstract').val();
     var resourceTitle = $('#resource-title').val();
     var resourceKeywords = $('#resource-keywords').val() ? $('#resource-keywords').val() : "";
-    var resourceType = resourceTypeSwitch($('#resource-type').val());
+    var resourceType = $('#resource-type').val();
+    var resourcePublic = $("#resource-public").prop("checked");
 
-     if (!resourceTitle || !resourceKeywords || !resourceAbstract) {
+    if (!resourceTitle || !resourceKeywords || !resourceAbstract)
+    {
         displayStatus.removeClass('uploading');
         displayStatus.addClass('error');
         displayStatus.html('<em>You must provide all metadata information.</em>');
-        return;
+        return
     }
 
-     upload_link = upload_link + "&title=" + resourceTitle + "&abstract=" + resourceAbstract + "&keywords=" + resourceKeywords;
-
+    var csrf_token = getCookie('csrftoken');
     $(this).prop('disabled', true);
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: upload_link,
+        headers:{'X-CSRFToken':csrf_token},
         dataType:'json',
+        data: {'title':resourceTitle, 'abstract': resourceAbstract,
+            'keyword': resourceKeywords, 'res_type':resourceType,
+            'waterml_link': waterml_link, 'public': resourcePublic},
         success: function (data) {
             debugger;
             $('#hydroshare-proceed').prop('disabled', false);
@@ -73,3 +65,19 @@ $('#hydroshare-proceed').on('click', function ()  {
         }
     });
 });
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
