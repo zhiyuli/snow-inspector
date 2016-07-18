@@ -1,20 +1,13 @@
-
-
 import json
 import datetime
-import sys
 import tempfile
 import shutil
 import os
 import traceback
 import urllib
-import ast
 
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.core.urlresolvers import reverse
-from tethys_gizmos.gizmo_options import MapView, MVLayer, MVView
-from tethys_apps.sdk.gizmos import Button, TextInput, SelectInput
 from hs_restclient import HydroShare, HydroShareAuthBasic
 from oauthlib.oauth2 import TokenExpiredError
 from hs_restclient import HydroShare, HydroShareAuthOAuth2, HydroShareNotAuthorized, HydroShareNotFound
@@ -163,7 +156,7 @@ def getOAuthHS(request):
 
     return hs
 
-
+@login_required()
 def upload_to_hydroshare(request):
 
     print "running upload_to_hydroshare!"
