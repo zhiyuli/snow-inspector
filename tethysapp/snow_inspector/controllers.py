@@ -183,7 +183,7 @@ def upload_to_hydroshare(request):
 
             res_id = None
             hs = getOAuthHS(request)
-            if r_type.lower() == 'genericeresource':
+            if r_type.lower() == 'genericresource':
                 #download the kml file to a temp directory
                 temp_dir = tempfile.mkdtemp()
 
