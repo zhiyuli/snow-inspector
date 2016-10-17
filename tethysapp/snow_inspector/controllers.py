@@ -1,8 +1,5 @@
-
-
 import json
 import datetime
-import sys
 import tempfile
 import shutil
 import os
@@ -11,9 +8,6 @@ import urllib
 
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.core.urlresolvers import reverse
-from tethys_gizmos.gizmo_options import MapView, MVLayer, MVView
-from tethys_apps.sdk.gizmos import Button, TextInput, SelectInput
 from hs_restclient import HydroShare, HydroShareAuthBasic
 from oauthlib.oauth2 import TokenExpiredError
 from hs_restclient import HydroShare, HydroShareAuthOAuth2, HydroShareNotAuthorized, HydroShareNotFound
@@ -162,47 +156,73 @@ def getOAuthHS(request):
 
     return hs
 
-
+@login_required()
 def upload_to_hydroshare(request):
 
     print "running upload_to_hydroshare!"
     temp_dir = None
     try:
         return_json = {}
-        if request.method == 'GET':
-            get_data = request.GET
+        if request.method == 'POST':
+            post_data = request.POST
 
-            base_url = request.build_absolute_uri()
-            waterml_url = base_url.replace('upload-to-hydroshare', 'waterml')
+            prefix = "http://"
+            if request.is_secure():
+               prefix = "https://"
+            waterml_url = prefix + request.get_host() + post_data['waterml_link']
+            #  waterml_url = 'https://appsdev.hydroshare.org' + post_data['waterml_link']
             print waterml_url
 
-            r_title = request.GET['title']
-            r_abstract = request.GET['abstract']
-            r_keywords_raw = request.GET['keywords']
-            r_type = 'GenericResource'
+            r_title = post_data['title']
+            r_abstract = post_data['abstract']
+            r_keywords_raw = post_data['keyword']
             r_keywords = r_keywords_raw.split(',')
+            r_type = post_data['res_type']
 
+            r_public = post_data['public']
+
+            res_id = None
             hs = getOAuthHS(request)
+            if r_type.lower() == 'genericresource':
+                #download the kml file to a temp directory
+                temp_dir = tempfile.mkdtemp()
 
-            #download the kml file to a temp directory
-            temp_dir = tempfile.mkdtemp()
+                waterml_file_path = os.path.join(temp_dir, "snow.wml")
+                print waterml_file_path
 
-            waterml_file_path = os.path.join(temp_dir, "snow.wml")
-            print waterml_file_path
+                urllib.urlretrieve(waterml_url, waterml_file_path)
 
-            urllib.urlretrieve(waterml_url, waterml_file_path)
+                #upload the temp file to HydroShare
+                if os.path.exists(waterml_file_path):
+                    res_id = hs.createResource(r_type, r_title, resource_file=waterml_file_path,
+                                                          keywords=r_keywords, abstract=r_abstract)
+                else:
+                    raise
+            elif r_type.lower() == 'reftimeseriesresource':
 
-            #upload the temp file to HydroShare
-            if os.path.exists(waterml_file_path):
-                resource_id = hs.createResource(r_type, r_title, resource_file=waterml_file_path,
-                                                      keywords=r_keywords, abstract=r_abstract)
+                ref_type = "rest"
+                metadata = []
+                metadata.append({"referenceurl":
+                             {"value": waterml_url,
+                              "type": ref_type}})
+                print metadata
+                res_id = hs.createResource(r_type,
+                           r_title,
+                           resource_file=None,
+                           keywords=r_keywords,
+                           abstract=r_abstract,
+                           metadata=json.dumps(metadata))
+
+            if res_id is not None:
+                if r_public.lower() == 'true':
+                    hs.setAccessRules(res_id, public=True)
                 return_json['success'] = 'File uploaded successfully!'
-                return_json['newResource'] = resource_id
+                return_json['newResource'] = res_id
             else:
                 raise
 
     except ObjectDoesNotExist as e:
-        print ("1231")
+        print ("ObjectDoesNotExist")
         print str(e)
         return_json['error'] = 'Login timed out! Please re-sign in with your HydroShare account.'
     except TokenExpiredError as e:

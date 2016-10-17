@@ -52,7 +52,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h6 class="modal-title">Upload File to HydroShare as a Resource(*Required)</h6>
+                <h6 class="modal-title">Share this Time Series on HydroShare(*Required)</h6>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -62,14 +62,8 @@
                 <div class="form-group">
                     <label for="resource-type" class="control-label">*Resource Type:</label>
                     <select class="form-control" id="resource-type">
-                        <option>Generic</option>
-                        <!--<option>Geographic Raster</option>-->
-                        <!--<option>HIS Referenced Time Series</option>-->
-                        <!--<option>Model Program</option>-->
-                        <!--<option>Model Instance</option>-->
-                        <!--<option>Multidimensional (NetCDF)</option>-->
-                        <!--<option>Time Series</option>-->
-                        <!--<option>Application</option>-->
+                        <option value="GenericResource">Generic</option>
+                        <option value="RefTimeSeriesResource" selected>Referenced Time Series</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -79,6 +73,9 @@
                 <div class="form-group">
                     <label for="resource-keywords" class="control-label">*Resource Keywords:</label>
                     <input type="text" class="form-control" id="resource-keywords">
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="resource-public" checked> Make It Public<br>
                 </div>
             </div>
             <div class="modal-footer">
