@@ -13,7 +13,12 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
 from tethys_gizmos.gizmo_options import MapView, MVLayer, MVView
-from tethys_apps.sdk.gizmos import Button, TextInput, SelectInput
+try:
+    # pre 1.4
+    from tethys_apps.sdk.gizmos import Button, TextInput, SelectInput
+except:
+    # 1.4
+    from tethys_sdk.gizmos import Button, TextInput, SelectInput
 from hs_restclient import HydroShare, HydroShareAuthBasic
 from oauthlib.oauth2 import TokenExpiredError
 from hs_restclient import HydroShare, HydroShareAuthOAuth2, HydroShareNotAuthorized, HydroShareNotFound
